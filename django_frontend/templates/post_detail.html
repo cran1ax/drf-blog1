@@ -1,24 +1,40 @@
 {% extends 'base.html' %}
 
-{% block title %}{{ post.title }}{% endblock %}
+{% block title %}{{ post.title }} - Django Blog{% endblock %} {# Added project name to title #}
 
 {% block content %}
-<h2>{{ post.title }}</h2>
-<div class="post-meta">
-    👤 By {{ post.author.username }} | 📅 {{ post.created_at|date:"F d, Y" }}
-</div>
 
-<div style="margin-top: 2rem; line-height: 1.7;">
-    {{ post.content|linebreaks }}
-</div>
+    {% if api_error %}
+        <div class="error">⚠️ {{ api_error }}</div>
+    {% elif post %} {# Only show post content if post data exists #}
+        <h2>{{ post.title }}</h2>
+        <div class="post-meta">
+            {# Check if author exists before accessing username #}
+            👤 By {{ post.author.username | default:"Unknown" }} | 📅 {{ post.created_at|date:"F d, Y" }}
+        </div>
 
-{% if user.is_authenticated and user == post.author %}
-    <div style="margin: 2rem 0; padding: 1.5rem; background: #f0f0f0; border-radius: 10px;">
-        <h4 style="margin: 0 0 1rem 0; border: none;">Post Actions</h4>
-        <a href="{% url 'update_post' post.id %}" class="btn">✏️ Edit Post</a>
-        <a href="{% url 'delete_post' post.id %}" class="btn" style="background: linear-gradient(135deg, #f5576c 0%, #c62828 100%);">🗑️ Delete Post</a>
-    </div>
-{% endif %}
-<hr style="margin-top: 2rem;">
-<a href="{% url 'all_posts' %}">← Back to all posts</a>
+        <div style="margin-top: 2rem; line-height: 1.7;">
+            {{ post.content|linebreaks }}
+        </div>
+
+        {# Check if user is logged in (token in session) #}
+        {% if request.session.access_token %}
+            {# Check if profile exists in session AND username matches post author #}
+            {% if request.session.user_profile and request.session.user_profile.username == post.author.username %}
+                <div style="margin: 2rem 0; padding: 1.5rem; background: #f0f0f0; border-radius: 10px;">
+                    <h4 style="margin: 0 0 1rem 0; border: none;">Post Actions</h4>
+                    {# Use post.id which comes from the API context #}
+                    <a href="{% url 'update_post' post.id %}" class="btn">✏️ Edit Post</a>
+                    <a href="{% url 'delete_post' post.id %}" class="btn" style="background: linear-gradient(135deg, #f5576c 0%, #c62828 100%);">🗑️ Delete Post</a>
+                </div>
+            {% endif %}
+        {% endif %}
+        <hr style="margin-top: 2rem;">
+        <a href="{% url 'all_posts' %}">← Back to all posts</a>
+
+    {% else %} {# Handle case where post is None but no API error occurred (should be rare) #}
+        <div class="error">Post data not available.</div>
+        <a href="{% url 'all_posts' %}">← Back to all posts</a>
+    {% endif %}
+
 {% endblock %}

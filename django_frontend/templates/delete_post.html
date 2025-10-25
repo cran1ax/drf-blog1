@@ -5,9 +5,17 @@
 {% block content %}
 <h2>🗑️ Delete Post</h2>
 
+{% if api_error %}
+    <div class="error">⚠️ {{ api_error }}</div>
+{% endif %}
+
 <div style="background-color: #ffebee; border: 1px solid #c62828; padding: 1.5rem; border-radius: 10px; margin-bottom: 2rem;">
     <h3>⚠️ Are you sure you want to delete this post?</h3>
-    <p><strong>Title:</strong> {{ post.title }}</p>
+    {% if post %}
+        <p><strong>Title:</strong> {{ post.title }}</p>
+    {% else %}
+        <p>Loading post details...</p>
+    {% endif %}
     <p style="color: #c62828; font-weight: 600;">This action cannot be undone.</p>
 </div>
 
@@ -17,7 +25,10 @@
         <button type="submit" class="btn" style="background: linear-gradient(135deg, #f5576c 0%, #c62828 100%);">
             Yes, Delete Post
         </button>
-        <a href="{% url 'post_detail' post.id %}" style="margin-left: 1rem;">Cancel</a>
+        <a href="{% if post %}{% url 'post_detail' post_id %}{% else %}{% url 'all_posts' %}{% endif %}"
+           style="margin-left: 1rem;">
+           Cancel
+        </a>
     </div>
 </form>
 {% endblock %}
