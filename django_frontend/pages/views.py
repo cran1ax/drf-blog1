@@ -237,6 +237,9 @@ def profile_view(request):
             response = requests.get(api_url, headers=headers)
             response.raise_for_status()
             profile_data = response.json()
+            print("--- Profile Data Received by Frontend View ---")
+            print(profile_data)
+            print("--- End Profile Data ---")
 
         except requests.exceptions.RequestException as e:
             error = f"Could not fetch profile from API: {e}"

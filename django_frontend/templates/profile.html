@@ -5,10 +5,16 @@
 {% block content %}
 <h2>👤 Profile</h2>
 
+{% if api_error %}
+    <div class="error">⚠️ {{ api_error }}</div>
+{% endif %}
+
+{% if profile %} {# Check if the profile data exists #}
 <div class="form-container">
-    <h3>Hello, {{ user.username }}!</h3>
-    <p>Your email: {{ user.email }}</p>
-    <p>Your name: {{ user.first_name }} {{ user.last_name }}</p>
+    {# Use the 'profile' variable passed from the view #}
+    <h3>Hello, {{ profile.username | default:"User" }}!</h3>
+    <p>Your email: {{ profile.email | default:"Not provided" }}</p>
+    <p>Your name: {{ profile.first_name | default:"" }} {{ profile.last_name | default:"" }}</p>
 
     <h3 style="margin-top: 2rem;">Update Your Profile</h3>
     <form method="post">
@@ -23,19 +29,25 @@
 
         <div class="form-group">
             <label for="first_name">First Name:</label>
-            <input type="text" id="first_name" name="first_name" value="{{ user.first_name }}">
+            {# Pre-fill form using the 'profile' variable #}
+            <input type="text" id="first_name" name="first_name" value="{{ profile.first_name | default:'' }}">
         </div>
         <div class="form-group">
             <label for="last_name">Last Name:</label>
-            <input type="text" id="last_name" name="last_name" value="{{ user.last_name }}">
+            <input type="text" id="last_name" name="last_name" value="{{ profile.last_name | default:'' }}">
         </div>
         <div class="form-group">
             <label for="email">Email:</label>
-            <input type="email" id="email" name="email" value="{{ user.email }}">
+            <input type="email" id="email" name="email" value="{{ profile.email | default:'' }}">
         </div>
         <div class="form-actions">
             <button type="submit" class="btn">Update Profile</button>
         </div>
     </form>
 </div>
+{% else %}
+    {# Show loading message if profile isn't loaded yet #}
+    <p>Loading profile...</p>
+{% endif %}
+
 {% endblock %}
