@@ -320,46 +320,73 @@ def post_detail(request, post_id):
 
 def login_view(request):
     """
-    Renders login form & handles login via backend API token endpoint.
-    Stores the received token in the frontend's session.
+    Handles login via backend API, stores token, AND fetches/stores user profile.
     """
-    if is_authenticated(request): # Check session for token
+    if is_authenticated(request):
          return redirect('home')
 
     error = None
     if request.method == 'POST':
         username = request.POST.get('username')
         password = request.POST.get('password')
-
+        print(f"\nAttempting login for user: {username}") # DEBUG
         try:
-            # Call the backend API's token endpoint
-            # Note: Need to adjust URL base if BACKEND_API_URL includes /api
+            # Step 1: Get Tokens
             api_token_url = f"{BACKEND_API_URL.replace('/api', '')}/api/token/"
-            response = requests.post(api_token_url, data={'username': username, 'password': password})
-            response.raise_for_status()
-
-            token_data = response.json()
+            print(f"Calling token URL: {api_token_url}") # DEBUG
+            response_token = requests.post(api_token_url, data={'username': username, 'password': password})
+            print(f"Token response status: {response_token.status_code}") # DEBUG
+            response_token.raise_for_status()
+            token_data = response_token.json()
             access_token = token_data.get('access')
-            refresh_token = token_data.get('refresh') # Optional: store refresh token too
 
             if access_token:
-                # SUCCESS: Store token in frontend session
+                print("Token received successfully.") # DEBUG
+                # Step 2: Store Token in Session
                 request.session['access_token'] = access_token
-                # request.session['refresh_token'] = refresh_token # Store refresh if needed
-                request.session.set_expiry(0) # Make session last until browser closes
+                request.session.set_expiry(0)
                 print("Token stored in session")
-                return redirect('home')
+
+                # Step 3: Fetch User Profile using the new token
+                try:
+                    print("Attempting to fetch profile...") # DEBUG
+                    api_profile_url = f"{BACKEND_API_URL}/auth/profile/"
+                    headers = {'Authorization': f'Bearer {access_token}'}
+                    print(f"Calling profile URL: {api_profile_url}") # DEBUG
+                    response_profile = requests.get(api_profile_url, headers=headers)
+                    print(f"Profile fetch response status: {response_profile.status_code}") # DEBUG
+                    response_profile.raise_for_status() # Check for HTTP errors (4xx, 5xx)
+                    user_profile_data = response_profile.json()
+
+                    print("Fetched Profile Data:", user_profile_data) # DEBUG
+
+                    # Store necessary profile info (like username or ID) in session
+                    request.session['user_profile'] = {
+                        'id': user_profile_data.get('id'),
+                        'username': user_profile_data.get('username')
+                    }
+                    print("User profile stored in session") # DEBUG
+                except requests.exceptions.RequestException as profile_e:
+                    # Log the specific error during profile fetch
+                    print(f"!!! EXCEPTION during profile fetch: {profile_e}") # DEBUG
+                    # Decide how to handle this - maybe still redirect but log error?
+                    # error = "Login succeeded, but failed to fetch profile details." # Option to show user
+
+                print("Redirecting to home after profile fetch attempt...") # DEBUG
+                return redirect('home') # Redirect after successful login AND profile fetch attempt
             else:
                 error = "Login failed: No token received from API."
+                print("Login failed: No access token in response.") # DEBUG
 
         except requests.exceptions.HTTPError as e:
              if e.response.status_code == 401: error = "Invalid username or password."
              else: error = f"API Error during login ({e.response.status_code}): {e.response.text}"
-             print(f"API Login Error ({e.response.status_code}): {e}")
+             print(f"API Login HTTP Error ({e.response.status_code}): {e}") # DEBUG
         except requests.exceptions.RequestException as e:
             error = f"Could not connect to login API: {e}"
-            print(f"API Login Connection Error: {e}")
+            print(f"API Login Connection Error: {e}") # DEBUG
 
+    # Render login page if GET or if POST failed
     context = {'error': error, 'user_is_authenticated': False}
     return render(request, 'login.html', context)
 
