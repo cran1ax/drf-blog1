@@ -123,8 +123,8 @@ SIMPLE_JWT = {
 # --- CORS SETTINGS ---
 # Define which origins (frontend servers) are allowed to make requests
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:8001",    # Your NEW frontend Django server
-    "http://127.0.0.1:8001",   # Your NEW frontend Django server (alternative IP)
+    "http://localhost:8000",    # Your NEW frontend Django server
+    "http://127.0.0.1:8000",   # Your NEW frontend Django server (alternative IP)
     # Add other origins if needed
 ]
 # Allow cookies and Authorization headers to be sent from these origins
