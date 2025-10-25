@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block title %}Home - Django Blog{% endblock %}
+
+{% block content %}
+<h2>🌟 Welcome to Django Blog</h2>
+<p style="text-align: center; color: #666; font-size: 1.1rem; margin-bottom: 2rem;">
+    Discover amazing stories, share your thoughts, and connect with our community
+</p>
+
+<h3>📰 Recent Posts</h3>
+<div id="recent-posts">
+    {% if recent_posts %}
+        {% for post in recent_posts %}
+            <div class="post-card">
+                <h4><a href="#">{{ post.title }}</a></h4>
+                <div class="post-meta">
+                    👤 By {{ post.author.username }} | 📅 {{ post.created_at|date:"F d, Y" }}
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <div class="error">📭 No recent posts found.</div>
+    {% endif %}
+</div>
+{% endblock %}

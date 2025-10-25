@@ -4,7 +4,9 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 
-# 1. ADD THESE IMPORTS
+# 1. Import your new view from the blog app
+from blog.views import home 
+
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
@@ -12,16 +14,16 @@ from rest_framework_simplejwt.views import (
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api-auth/', include('rest_framework.urls')),
     
-    # 2. ADD THESE TWO NEW URLS
+    # --- API URLS ---
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-
-    # 3. Your 'blog.urls' must come AFTER the specific token URLs
+    path('api-auth/', include('rest_framework.urls')),
     path('api/', include('blog.urls')),
+
+    # --- FRONTEND URLS ---
+    # 2. Add this path for your homepage
+    path('', home, name='home'), 
 ]
 
-# Serve media files in development
-if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+# ... (your static/media settings) ...

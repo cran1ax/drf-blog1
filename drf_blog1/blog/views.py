@@ -7,6 +7,7 @@ from django.utils import timezone
 from django.contrib.auth import login, logout
 from django.contrib.auth.models import User
 from .models import Post
+from django.shortcuts import render
 from .serializers import (
     PostListSerializer, 
     PostDetailSerializer, PostCreateSerializer,
@@ -116,6 +117,22 @@ def update_user_profile(request):
 def test_auth(request):
     """Test endpoint to verify authentication URLs work"""
     return Response({'message': 'Authentication endpoints are working!'})
+
+def home(request):
+    """
+    This view renders the homepage (index.html).
+    """
+    # 1. Get the 5 most recent posts from the database
+    #    (This replaces the '/api/recent-posts/' fetch)
+    recent_posts = Post.objects.all().order_by('-created_at')[:5]
+    
+    # 2. Create a "context" dictionary to pass data to the template
+    context = {
+        'recent_posts': recent_posts
+    }
+    
+    # 3. Render the index.html template with the context data
+    return render(request, 'index.html', context)
 
 class PostUpdateView(generics.UpdateAPIView):
     queryset = Post.objects.all()
