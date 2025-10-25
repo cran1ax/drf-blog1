@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block title %}Your Profile{% endblock %}
+
+{% block content %}
+<h2>👤 Profile</h2>
+
+<div class="form-container">
+    <h3>Hello, {{ user.username }}!</h3>
+    <p>Your email: {{ user.email }}</p>
+    <p>Your name: {{ user.first_name }} {{ user.last_name }}</p>
+
+    <h3 style="margin-top: 2rem;">Update Your Profile</h3>
+    <form method="post">
+        {% csrf_token %}
+        {% if errors %}
+            {% for field, error_list in errors.items %}
+                {% for error in error_list %}
+                    <div class="error">{{ field|capfirst }}: {{ error }}</div>
+                {% endfor %}
+            {% endfor %}
+        {% endif %}
+
+        <div class="form-group">
+            <label for="first_name">First Name:</label>
+            <input type="text" id="first_name" name="first_name" value="{{ user.first_name }}">
+        </div>
+        <div class="form-group">
+            <label for="last_name">Last Name:</label>
+            <input type="text" id="last_name" name="last_name" value="{{ user.last_name }}">
+        </div>
+        <div class="form-group">
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" value="{{ user.email }}">
+        </div>
+        <div class="form-actions">
+            <button type="submit" class="btn">Update Profile</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

@@ -1,17 +1,16 @@
 {% extends 'base.html' %}
 
-{% block title %}Home - Django Blog{% endblock %}
+{% block title %}All Posts - Django Blog{% endblock %}
 
 {% block content %}
-<h2>🌟 Welcome to Django Blog</h2>
+<h2>📄 All Posts</h2>
 <p style="text-align: center; color: #666; font-size: 1.1rem; margin-bottom: 2rem;">
-    Discover amazing stories, share your thoughts, and connect with our community
+    Explore all the amazing content from our community
 </p>
 
-<h3>📰 Recent Posts</h3>
-<div id="recent-posts">
-    {% if recent_posts %}
-        {% for post in recent_posts %}
+<div id="posts">
+    {% if posts %}
+        {% for post in posts %}
             <div class="post-card">
                 <h4><a href="{% url 'post_detail' post.id %}">{{ post.title }}</a></h4>
                 <div class="post-meta">
@@ -20,7 +19,7 @@
             </div>
         {% endfor %}
     {% else %}
-        <div class="error">📭 No recent posts found.</div>
+        <div class="error">📭 No posts found.</div>
     {% endif %}
 </div>
 {% endblock %}
