@@ -1,13 +1,11 @@
 # In django_frontend/frontend_config/urls.py
 
-from django.contrib import admin
 from django.urls import path, include
 
 # Import all views from the pages app
 from pages import views as page_views
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
 
     # --- Frontend Page URLs ---
     path('', page_views.home, name='home'),

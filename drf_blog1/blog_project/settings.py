@@ -33,11 +33,11 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware', # Handles CORS headers
     'django.middleware.security.SecurityMiddleware',
+    'corsheaders.middleware.CorsMiddleware', # Handles CORS headers
     'django.contrib.sessions.middleware.SessionMiddleware', # Needed for Django Admin
     'django.middleware.common.CommonMiddleware',
-    # 'django.middleware.csrf.CsrfViewMiddleware', # NOT needed for a stateless API
+    #'django.middleware.csrf.CsrfViewMiddleware', # NOT needed for a stateless API
     'django.contrib.auth.middleware.AuthenticationMiddleware', # Needed for Django Admin
     'django.contrib.messages.middleware.MessageMiddleware', # Needed for Django Admin
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
